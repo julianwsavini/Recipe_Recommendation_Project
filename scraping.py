@@ -2,18 +2,29 @@ import requests
 import json
 
 
-def scrape_recipe(id):
-    dct = requests.get(f'https://mapi.yummly.com/mapi/v19/content/feed?id={id}').json()['feed']
-    if not dct:
-        return dict()
-    else:
-        dct = dct[0]
+def scrape_recipe(dct):
+    seo = dct['seo']
+    dct = dct['feed'][0]
+
     recipe = dict()
     # get recipe metadata
     recipe['name'] = dct['display']['displayName']
+    recipe['url'] = seo['web']['link-tags'][0]['href']
     recipe['recipeType'] = dct['recipeType'][0]
 
     recipe['keywords'] = dct['seo']['spotlightSearch']['keywords']
+
+    # recipe description
+    if dct['content']['description']:
+        recipe['description'] = dct['content']['description']['text']
+    else:
+        recipe['description'] = ''
+
+    # recipe steps
+    if dct['content']['preparationSteps']:
+        recipe['steps'] = [x for x in dct['content']['preparationSteps']]
+    else:
+        recipe['steps'] = []
 
     # get recipe content
     recipe['tags'] = dict()
@@ -72,7 +83,9 @@ def scrape_feed(total=499, limit=50):
         dct = requests.get(url).json()
         ids = [x['tracking-id'].split(',')[0].strip('recipe:') for x in dct['feed']]
         for id in ids:
-            recipe_data.append(scrape_recipe(id))
+            dct = requests.get(f'https://mapi.yummly.com/mapi/v19/content/feed?id={id}').json()
+            if dct and dct['feed']:
+                recipe_data.append(scrape_recipe(dct))
     return recipe_data
 
 
