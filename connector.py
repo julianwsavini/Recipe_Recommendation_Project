@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     uri = 'bolt://localhost:7687'
     user ='neo4j'
-    password = 'Cheetah871'
+    password = 'password'
     driver = GraphDatabase.driver(uri, auth=(user,password))
 
     #query data from Mongodb
