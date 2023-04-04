@@ -27,14 +27,13 @@ def scrape_recipe(dct):
         recipe['steps'] = []
 
     # get recipe content
-    recipe['tags'] = dict()
     tags = dct['content']['tags'].keys()
     all_tags = ['dish', 'course', 'technique', 'cuisine']
     for tag in all_tags:
         if tag in tags:
-            recipe['tags'][tag] = [x['display-name'] for x in dct['content']['tags'][tag]]
+            recipe[tag] = [x['display-name'] for x in dct['content']['tags'][tag]]
         else:
-            recipe['tags'][tag] = list()
+            recipe[tag] = list()
 
     # get ingredient data
     recipe['ingredients'] = []
@@ -44,12 +43,11 @@ def scrape_recipe(dct):
         ing_dct['category'] = ingredient['category']
 
         if not ingredient['quantity']:
-            ing_dct['quantity'] = dict()
+            ing_dct['quantity'] = {'metric': 'N/A', 'imperial': 'N/A'}
         else:
             ing_dct['quantity'] = {
                 'metric': str(ingredient['amount']['metric']['quantity']) + ' ' +
-                          ingredient['amount']['metric']['unit'][
-                              'abbreviation'],
+                          ingredient['amount']['metric']['unit']['abbreviation'],
                 'imperial': str(ingredient['amount']['imperial']['quantity']) + ' ' +
                             ingredient['amount']['imperial']['unit']['abbreviation'],
             }
