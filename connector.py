@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     uri = 'bolt://localhost:7687'
     user ='neo4j'
-    password = 'password'
+    password = 'Cheetah871'
     driver = GraphDatabase.driver(uri, auth=(user,password))
 
     #query data from Mongodb
@@ -31,11 +31,17 @@ if __name__ == '__main__':
         tx = session.begin_transaction()
         for record in data1:
             fields = {'field1': record['name'], 'field2': record['url'], 'field3': record['recipeType'], 'field4':
-                      record['keywords'], 'field5': record['description'], 'field6': record['steps'], 'field7': record['ingredients']}
+                      record['keywords'], 'field5': record['description'], 'field6': record['steps']} #'field7': [x['name'] for x in record['ingredients']]}
             query = 'CREATE (recipe:recipes {name: $field1, url: $field2, recipeType: $field3, keywords: \
-            $field4, description: $field5, steps: $field6, ingredients: $field7})'
+            $field4, description: $field5, steps: $field6})' # ingredients: $field7})'
+
             tx.run(query, **fields)
+            tx.run('UNWIND $value as ingredients  \
+                    MERGE (recipe:recipes {ing_name:ingredients.name})', value = record['ingredients'])
             #issue with ingredients and tags, reviews, nutrition
         tx.commit()
+        #for record in data1:
 
+
+ #ingredients[$name] is not NULL
 
