@@ -79,12 +79,12 @@ if __name__ == '__main__':
     dbname = get_database()
     collection = dbname['recipes']
 
-    df = run_pca(collection)
-
     with open('data/recipe_data.json') as data_file:
         data = json.load(data_file)
 
     collection.insert_many([item for item in data])
+
+    df = run_pca(collection)
 
     uri = 'bolt://localhost:7687'
     user = 'neo4j'
