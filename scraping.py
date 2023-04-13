@@ -55,8 +55,8 @@ def scrape_recipe(dct):
         recipe['ingredients'].append(ing_dct)
 
     # get review data
-    recipe['reviews'] = {'avgRating': dct['content']['reviews']['averageRating'],
-                         'numReviews': dct['content']['reviews']['totalReviewCount']}
+    recipe['avgRating'] = dct['content']['reviews']['averageRating']
+    recipe['numReviews'] = dct['content']['reviews']['totalReviewCount']
 
     # get nutritional data
     recipe['nutrition'] = list()

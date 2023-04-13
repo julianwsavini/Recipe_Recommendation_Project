@@ -50,14 +50,14 @@ def clean_columns(collection):
     df = expand_column(df, 'nutrition')
 
     # expand ratings column
-    df['avgRating'] = df.apply(lambda row: row['reviews']['avgRating'], axis=1)
-    df['numReviews'] = df.apply(lambda row: row['reviews']['numReviews'], axis=1)
+    df['avgRating'] = df.apply(lambda row: row['avgRating'], axis=1)
+    df['numReviews'] = df.apply(lambda row: row['numReviews'], axis=1)
     df = df.drop(columns=['reviews'])
 
     return df
 
 
-def run_pca(collection):
+def run_famd(collection):
     org_df = pd.DataFrame(list(collection.find()))
     df = clean_columns(collection)
 
@@ -75,16 +75,31 @@ def run_pca(collection):
     return df
 
 
+def euclidean(x, y):
+    return (((y[1] - x[1]) ** 2) + ((y[0] - x[0]) ** 2)) ** 0.5
+
+
+def compare_recipe(row, df, id):
+    return df.loc[df['_id'] != id].apply(lambda recipe: euclidean([row[0], row[1]], [recipe[0], recipe[1]]), axis=1)
+
+
+def compare_all_recipes(df):
+    return df.apply(lambda row: compare_recipe(row, df, row['_id']), axis=1)
+
+
 if __name__ == '__main__':
     dbname = get_database()
     collection = dbname['recipes']
+    collection.delete_many({})
 
     with open('data/recipe_data.json') as data_file:
         data = json.load(data_file)
 
     collection.insert_many([item for item in data])
 
-    df = run_pca(collection)
+    # generate similarity between recipes dataset
+    df = run_famd(collection)
+    edge_df = pd.concat([x for x in compare_all_recipes(df)])
 
     uri = 'bolt://localhost:7687'
     user = 'neo4j'
@@ -93,7 +108,6 @@ if __name__ == '__main__':
 
     # query data from Mongodb
     data1 = collection.find()
-
     with driver.session() as session:
         tx = session.begin_transaction()
         for record in data1:
