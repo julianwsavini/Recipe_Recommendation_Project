@@ -39,7 +39,7 @@ def clean_columns(collection):
         df = expand_column(df, col)
 
     # complex cols
-    complex = ['ingredients', 'reviews', 'nutrition']
+    complex = ['ingredients', 'nutrition']
 
     # expand ingredients column
     df['ingredients'] = df.apply(lambda row: [x['name'] for x in row['ingredients']], axis=1)
@@ -48,11 +48,6 @@ def clean_columns(collection):
     # expand nutrition column
     df['nutrition'] = df.apply(lambda row: [f"{x['value']} {x['name']}" for x in row['nutrition']], axis=1)
     df = expand_column(df, 'nutrition')
-
-    # expand ratings column
-    df['avgRating'] = df.apply(lambda row: row['avgRating'], axis=1)
-    df['numReviews'] = df.apply(lambda row: row['numReviews'], axis=1)
-    df = df.drop(columns=['reviews'])
 
     return df
 
@@ -79,12 +74,17 @@ def euclidean(x, y):
     return (((y[1] - x[1]) ** 2) + ((y[0] - x[0]) ** 2)) ** 0.5
 
 
-def compare_recipe(row, df, id):
-    return df.loc[df['_id'] != id].apply(lambda recipe: euclidean([row[0], row[1]], [recipe[0], recipe[1]]), axis=1)
+def compare_recipe(row, df):
+    new_df = pd.DataFrame(columns=['id_1', 'id_2', 'similarity'])
+    df = df.loc[df['_id'] != row['_id']]
+    new_df['id_2'] = df['_id']
+    new_df['similarity'] = df.apply(lambda recipe: euclidean([row[0], row[1]], [recipe[0], recipe[1]]), axis=1)
+    new_df['id_1'] = row['_id']
+    return new_df
 
 
 def compare_all_recipes(df):
-    return df.apply(lambda row: compare_recipe(row, df, row['_id']), axis=1)
+    return pd.concat([x for x in df.apply(lambda row: compare_recipe(row, df), axis=1)])
 
 
 if __name__ == '__main__':
@@ -99,7 +99,8 @@ if __name__ == '__main__':
 
     # generate similarity between recipes dataset
     df = run_famd(collection)
-    edge_df = pd.concat([x for x in compare_all_recipes(df)])
+    edge_df = compare_all_recipes(df)
+    edge_df.to_csv('data/edges.csv', index=False)
 
     uri = 'bolt://localhost:7687'
     user = 'neo4j'
