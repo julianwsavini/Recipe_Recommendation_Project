@@ -19,7 +19,7 @@ def scrape_recipe(dct):
     if dct['content']['description']:
         recipe['description'] = dct['content']['description']['text']
     else:
-        recipe['description'] = ''
+        recipe['description'] = 'N/A'
 
     # recipe steps
     if dct['content']['preparationSteps']:
@@ -89,7 +89,7 @@ def scrape_feed(total=499, limit=50):
 
 
 def main():
-    dct = scrape_feed()
+    dct = list({x['id']: x for x in scrape_feed()}.values())
     with open("data/recipe_data.json", "w") as final:
         json.dump(dct, final)
 

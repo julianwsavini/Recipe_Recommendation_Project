@@ -56,13 +56,12 @@ def run_famd(collection):
 
     # drop empties
     nums = df.select_dtypes(include=[np.number]).columns
-    strs = df.select_dtypes(exclude=[np.number]).columns
     df[nums] = df[nums].fillna(0)
-    df[strs] = df[strs].fillna('N/A')
+    df = df.fillna('N/A')
 
+    # run famd and output dataframe
     famd = FAMD().fit(df)
     fit_df = famd.transform(df)
-
     df = pd.concat([org_df, fit_df], axis=1).reset_index(drop=True)
 
     return df
@@ -102,6 +101,21 @@ if __name__ == '__main__':
     # edge_df = compare_all_recipes(df)
     # edge_df.to_csv('data/edges.csv', index=False)
 
+    # cursor = collection.aggregate(
+    #     [
+    #         {"$group": {"_id": "$recipeId", "unique_ids": {"$addToSet": "$_id"}, "count": {"$sum": 1}}},
+    #         {"$match": {"count": {"$gte": 2}}}
+    #     ]
+    # )
+    #
+    # response = []
+    # for doc in cursor:
+    #     del doc["unique_ids"][0]
+    #     for id in doc["unique_ids"]:
+    #         response.append(id)
+    #
+    # collection.delete_many({"_id": {"$in": response}})
+
     # connect to neo4j
     uri = 'bolt://localhost:7687'
     user = 'neo4j'
@@ -138,9 +152,9 @@ if __name__ == '__main__':
         # insert edges from csv
         query = '''
         LOAD CSV WITH HEADERS FROM 'file:///Users/max/Northeastern/spring_2023/DS_4300/recipes/data/edges.csv' AS row
-        MATCH (source {recipeId: row.id_1})
-        MATCH (target {recipeId: row.id_2})
-        CREATE (source)-[:SIMILAR {similarity: row.similarity}]->(target)
+        MERGE (source {recipeId: row.id_1})
+        MERGE (target {recipeId: row.id_2})
+        MERGE (source)-[:SIMILAR {similarity: row.similarity}]->(target)
         '''
         tx.run(query)
         tx.commit()
