@@ -99,8 +99,8 @@ if __name__ == '__main__':
 
     # generate similarity between recipes dataset
     df = run_famd(collection)
-    edge_df = compare_all_recipes(df)
-    edge_df.to_csv('data/edges.csv', index=False)
+    # edge_df = compare_all_recipes(df)
+    # edge_df.to_csv('data/edges.csv', index=False)
 
     # connect to neo4j
     uri = 'bolt://localhost:7687'
@@ -115,10 +115,9 @@ if __name__ == '__main__':
         # flush database
         tx = session.begin_transaction()
         query = 'MATCH (n) DETACH DELETE n'
-        # tx.commit()
+        tx.run(query)
 
         # insert nodes from Mongo
-        # tx = session.begin_transaction()
         for record in data1:
             ingredients = []
             for ingredient in record['ingredients']:
@@ -134,18 +133,14 @@ if __name__ == '__main__':
             $field4, description: $field5, steps: $field6, dish: $field7, course: $field8, \
             technique: $field9, cuisine: $field10, avgRating: $field11, numReviews: $field12, \
             ingredients: $field13, recipeId: $field14})'
-            print(record)
-
             tx.run(query, **fields)
-        tx.commit()
 
         # insert edges from csv
-        # tx = session.begin_transaction()
-        # query = '''
-        # LOAD CSV WITH HEADERS FROM 'file:///Users/max/Northeastern/spring_2023/DS_4300/recipes/data/edges.csv' AS row
-        # MATCH (source {recipe_id: row.id_1})
-        # MATCH (target {recipe_id: row.id_2})
-        # CREATE (source)-[:SIMILAR {similarity: row.similarity}]->(target)
-        # '''
-        # tx.run(query)
-        # tx.commit()
+        query = '''
+        LOAD CSV WITH HEADERS FROM 'file:///Users/max/Northeastern/spring_2023/DS_4300/recipes/data/edges.csv' AS row
+        MATCH (source {recipeId: row.id_1})
+        MATCH (target {recipeId: row.id_2})
+        CREATE (source)-[:SIMILAR {similarity: row.similarity}]->(target)
+        '''
+        tx.run(query)
+        tx.commit()
