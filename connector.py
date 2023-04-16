@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     uri = 'bolt://localhost:7687'
     user = 'neo4j'
-    password = 'Cheetah871' #epd9htf5kvd_hwt.PZR'
+    password = 'Cheetah871'  # epd9htf5kvd_hwt.PZR'
     driver = GraphDatabase.driver(uri, auth=(user, password))
 
     # query data from Mongodb
@@ -120,17 +120,19 @@ if __name__ == '__main__':
             ingredients = []
             for ingredient in record['ingredients']:
                 ingredients.append(ingredient['name'])
-            fields = {'field1': record['name'], 'field2': record['url'], 'field3': record['recipeType'], 'field4':
-                record['keywords'], 'field5': record['description'],
-                      'field6': record['steps'], 'field7': list(filter(None,ingredients))}  # 'field7': [x['name'] for x in record['ingredients']]}
-            query = 'CREATE (recipe:recipes {name: $field1, url: $field2, recipeType: $field3, keywords: \
-            $field4, description: $field5, steps: $field6, ingredients: $field7})'
+            fields = {'field1': record['name'], 'field2': record['url'], 'field3': record['recipeType'],
+                      'field4': record['keywords'], 'field5': record['description'],
+                      'field6': record['steps'], 'field7': record['dish'], 'field8': record['course'],
+                      'field9': record['technique'], 'field10': record['cuisine'],
+                      'field11': record['avgRating'], 'field12': record['numReviews'],
+                      'field13': list(filter(None, ingredients))}
 
-            query2 = 'MERGE (recipe: recipes {ingredients: $list})'
+            query = 'CREATE (recipe:recipes {name: $field1, url: $field2, recipeType: $field3, keywords: \
+            $field4, description: $field5, steps: $field6, dish: $field7, course: $field8, \
+            technique: $field9, cuisine: $field10, avgRating: $field11, numReviews: $field12, \
+            ingredients: $field13})'
 
             tx.run(query, **fields)
-            #tx.run('MERGE (recipe: recipes {ingredients: $list1})', list1=list(filter(None,ingredients)))
-            # issue with ingredients and tags, reviews, nutrition
         tx.commit()
         # for record in data1:
 
