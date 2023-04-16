@@ -38,9 +38,6 @@ def clean_columns(collection):
     for col in list_cols:
         df = expand_column(df, col)
 
-    # complex cols
-    complex = ['ingredients', 'nutrition']
-
     # expand ingredients column
     df['ingredients'] = df.apply(lambda row: [x['name'] for x in row['ingredients']], axis=1)
     df = expand_column(df, 'ingredients')
@@ -53,6 +50,7 @@ def clean_columns(collection):
 
 
 def run_famd(collection):
+    """Run dimensionality reduction algorithm on collection"""
     org_df = pd.DataFrame(list(collection.find()))
     df = clean_columns(collection)
 
@@ -75,15 +73,17 @@ def euclidean(x, y):
 
 
 def compare_recipe(row, df):
+    """Compare one recipe to all other recipes"""
     new_df = pd.DataFrame(columns=['id_1', 'id_2', 'similarity'])
-    df = df.loc[df['_id'] != row['_id']]
-    new_df['id_2'] = df['_id']
+    df = df.loc[df['id'] != row['id']]
+    new_df['id_2'] = df['id']
     new_df['similarity'] = df.apply(lambda recipe: euclidean([row[0], row[1]], [recipe[0], recipe[1]]), axis=1)
-    new_df['id_1'] = row['_id']
-    return new_df
+    new_df['id_1'] = row['id']
+    return new_df.sort_values(by='similarity').iloc[:20]
 
 
 def compare_all_recipes(df):
+    """Compare every recipe to every other recipe in dataframe"""
     return pd.concat([x for x in df.apply(lambda row: compare_recipe(row, df), axis=1)])
 
 
@@ -96,26 +96,29 @@ if __name__ == '__main__':
         data = json.load(data_file)
 
     collection.insert_many([item for item in data])
-    df = run_famd(collection)
-
-    # generate similarity between recipes dataset
-    df = run_famd(collection)
-    edge_df = pd.concat([x for x in compare_all_recipes(df)])
 
     # generate similarity between recipes dataset
     df = run_famd(collection)
     edge_df = compare_all_recipes(df)
     edge_df.to_csv('data/edges.csv', index=False)
 
+    # connect to neo4j
     uri = 'bolt://localhost:7687'
     user = 'neo4j'
-    password = 'Cheetah871'  # epd9htf5kvd_hwt.PZR'
+    password = 'epd9htf5kvd_hwt.PZR'  # 'Cheetah871'
     driver = GraphDatabase.driver(uri, auth=(user, password))
 
-    # query data from Mongodb
+    # get data from Mongodb
     data1 = collection.find()
+
     with driver.session() as session:
+        # flush database
         tx = session.begin_transaction()
+        query = 'MATCH (n) DETACH DELETE n'
+        # tx.commit()
+
+        # insert nodes from Mongo
+        # tx = session.begin_transaction()
         for record in data1:
             ingredients = []
             for ingredient in record['ingredients']:
@@ -125,15 +128,24 @@ if __name__ == '__main__':
                       'field6': record['steps'], 'field7': record['dish'], 'field8': record['course'],
                       'field9': record['technique'], 'field10': record['cuisine'],
                       'field11': record['avgRating'], 'field12': record['numReviews'],
-                      'field13': list(filter(None, ingredients))}
-
+                      'field13': list(filter(None, ingredients)),
+                      'field14': record['id']}
             query = 'CREATE (recipe:recipes {name: $field1, url: $field2, recipeType: $field3, keywords: \
             $field4, description: $field5, steps: $field6, dish: $field7, course: $field8, \
             technique: $field9, cuisine: $field10, avgRating: $field11, numReviews: $field12, \
-            ingredients: $field13})'
+            ingredients: $field13, recipeId: $field14})'
+            print(record)
 
             tx.run(query, **fields)
         tx.commit()
-        # for record in data1:
 
-# ingredients[$name] is not NULL
+        # insert edges from csv
+        # tx = session.begin_transaction()
+        # query = '''
+        # LOAD CSV WITH HEADERS FROM 'file:///Users/max/Northeastern/spring_2023/DS_4300/recipes/data/edges.csv' AS row
+        # MATCH (source {recipe_id: row.id_1})
+        # MATCH (target {recipe_id: row.id_2})
+        # CREATE (source)-[:SIMILAR {similarity: row.similarity}]->(target)
+        # '''
+        # tx.run(query)
+        # tx.commit()

@@ -9,6 +9,7 @@ def scrape_recipe(dct):
     recipe = dict()
     # get recipe metadata
     recipe['name'] = dct['display']['displayName']
+    recipe['id'] = dct['content']['details']['recipeId']
     recipe['url'] = seo['web']['link-tags'][0]['href']
     recipe['recipeType'] = dct['recipeType'][0]
 
