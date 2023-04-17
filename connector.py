@@ -81,49 +81,33 @@ def compare_recipe(row, df):
     return new_df.sort_values(by='similarity').iloc[:20]
 
 
-def compare_all_recipes(df):
+def generate_edges(df):
     """Compare every recipe to every other recipe in dataframe"""
-    return pd.concat([x for x in df.apply(lambda row: compare_recipe(row, df), axis=1)])
+    edge_df = pd.concat([x for x in df.apply(lambda row: compare_recipe(row, df), axis=1)])
+    edge_df.to_csv('data/edges.csv', index=False)
+    return edge_df
 
 
-if __name__ == '__main__':
+def load_mongo(db, data_url):
+    """Load data from file into mongo database"""
+
+    # flush database
     dbname = get_database()
-    collection = dbname['recipes']
+    collection = dbname[db]
     collection.delete_many({})
 
-    with open('data/recipe_data.json') as data_file:
+    # load in data
+    with open(data_url) as data_file:
         data = json.load(data_file)
-
     collection.insert_many([item for item in data])
 
-    # generate similarity between recipes dataset
-    df = run_famd(collection)
-    # edge_df = compare_all_recipes(df)
-    # edge_df.to_csv('data/edges.csv', index=False)
+    return collection
 
-    # cursor = collection.aggregate(
-    #     [
-    #         {"$group": {"_id": "$recipeId", "unique_ids": {"$addToSet": "$_id"}, "count": {"$sum": 1}}},
-    #         {"$match": {"count": {"$gte": 2}}}
-    #     ]
-    # )
-    #
-    # response = []
-    # for doc in cursor:
-    #     del doc["unique_ids"][0]
-    #     for id in doc["unique_ids"]:
-    #         response.append(id)
-    #
-    # collection.delete_many({"_id": {"$in": response}})
 
-    # connect to neo4j
-    uri = 'bolt://localhost:7687'
-    user = 'neo4j'
-    password = 'epd9htf5kvd_hwt.PZR'  # 'Cheetah871'
-    driver = GraphDatabase.driver(uri, auth=(user, password))
-
-    # get data from Mongodb
-    data1 = collection.find()
+def load_neo4j(collection, edge_url, uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.PZR'):
+    """Load data from Mongo into neo4j"""
+    driver = GraphDatabase.driver(uri, auth=(user, pw))
+    data = collection.find()
 
     with driver.session() as session:
         # flush database
@@ -132,7 +116,7 @@ if __name__ == '__main__':
         tx.run(query)
 
         # insert nodes from Mongo
-        for record in data1:
+        for record in data:
             ingredients = []
             for ingredient in record['ingredients']:
                 ingredients.append(ingredient['name'])
@@ -150,11 +134,18 @@ if __name__ == '__main__':
             tx.run(query, **fields)
 
         # insert edges from csv
-        query = '''
-        LOAD CSV WITH HEADERS FROM 'file:///Users/max/Northeastern/spring_2023/DS_4300/recipes/data/edges.csv' AS row
+        query = f"LOAD CSV WITH HEADERS FROM 'file:///{edge_url}' AS row " + '''
         MERGE (source {recipeId: row.id_1})
         MERGE (target {recipeId: row.id_2})
         MERGE (source)-[:SIMILAR {similarity: row.similarity}]->(target)
         '''
         tx.run(query)
         tx.commit()
+
+
+if __name__ == '__main__':
+    # import data into mongo
+    collection = load_mongo('recipes', 'data/recipe_data.json')
+
+    # import data into neo4j need full url because of neo4j security settings
+    load_neo4j(collection, '/Users/max/Northeastern/spring_2023/DS_4300/recipes/data/edges.csv')
