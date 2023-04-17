@@ -39,11 +39,13 @@ def clean_columns(collection):
         df = expand_column(df, col)
 
     # expand ingredients column
-    df['ingredients'] = df.apply(lambda row: [x['name'] for x in row['ingredients']], axis=1)
+    df['ingredients'] = df.apply(lambda row: [x['name']
+                                 for x in row['ingredients']], axis=1)
     df = expand_column(df, 'ingredients')
 
     # expand nutrition column
-    df['nutrition'] = df.apply(lambda row: [f"{x['value']} {x['name']}" for x in row['nutrition']], axis=1)
+    df['nutrition'] = df.apply(
+        lambda row: [f"{x['value']} {x['name']}" for x in row['nutrition']], axis=1)
     df = expand_column(df, 'nutrition')
 
     return df
@@ -76,14 +78,16 @@ def compare_recipe(row, df):
     new_df = pd.DataFrame(columns=['id_1', 'id_2', 'similarity'])
     df = df.loc[df['id'] != row['id']]
     new_df['id_2'] = df['id']
-    new_df['similarity'] = df.apply(lambda recipe: euclidean([row[0], row[1]], [recipe[0], recipe[1]]), axis=1)
+    new_df['similarity'] = df.apply(lambda recipe: euclidean(
+        [row[0], row[1]], [recipe[0], recipe[1]]), axis=1)
     new_df['id_1'] = row['id']
     return new_df.sort_values(by='similarity').iloc[:20]
 
 
 def generate_edges(df):
     """Compare every recipe to every other recipe in dataframe"""
-    edge_df = pd.concat([x for x in df.apply(lambda row: compare_recipe(row, df), axis=1)])
+    edge_df = pd.concat([x for x in df.apply(
+        lambda row: compare_recipe(row, df), axis=1)])
     edge_df.to_csv('data/edges.csv', index=False)
     return edge_df
 
@@ -143,9 +147,59 @@ def load_neo4j(collection, edge_url, uri='bolt://localhost:7687', user='neo4j', 
         tx.commit()
 
 
+def dct_to_query(dct):
+    """Convert dictionary of query attributes into query"""
+
+    # if there's only one attribute, return a simple query
+    if len(dct) == 1:
+        key = list(dct.keys())[0]
+        val = list(dct.values())[0]
+        return f'MATCH (r) WHERE ANY ({key} IN r.{key} WHERE {key} CONTAINS "{val}") WITH collect(r) as r RETURN r as recipes LIMIT 5'
+
+    # generate aliases for each separate match
+    aliases = [f'r{x}' for x in range(len(dct))]
+    counter = 0
+    query = str()
+
+    # repeatedly match with aliases
+    for key, val in dct.items():
+        alias = aliases[counter]
+        if counter == 0:
+            query += f'MATCH ({alias}) WHERE ANY ({key} IN {alias}.{key} WHERE {key} CONTAINS "{val}") WITH collect({alias}) as {alias} '
+            counter += 1
+            continue
+        query += f'MATCH ({alias}) WHERE ANY ({key} IN {alias}.{key} WHERE {key} CONTAINS "{val}") WITH {", ".join(aliases[:counter])}, collect({alias}) as {alias} '
+        counter += 1
+
+    # nest intersection operations since it can only take 2 parameters
+    inter = list()
+    for alias in aliases:
+        if not inter:
+            inter = alias
+        inter = f'apoc.coll.intersection({alias}, {inter})'
+    query += f'RETURN {inter} as recipes LIMIT 5'
+    return query
+
+
+def match_recipe(tx, query):
+    """Run simple match"""
+    result = tx.run(query)
+    return list(result)
+
+
+def run_query(query_dct, uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.PZR'):
+    """Run a query in neo4j"""
+    driver = GraphDatabase.driver(uri, auth=(user, pw))
+    with driver.session() as session:
+        query = dct_to_query(query_dct)
+        result = session.execute_read(match_recipe, query)
+    return [x.data() for x in result]
+
+
 if __name__ == '__main__':
     # import data into mongo
     collection = load_mongo('recipes', 'data/recipe_data.json')
 
     # import data into neo4j need full url because of neo4j security settings
-    load_neo4j(collection, '/Users/max/Northeastern/spring_2023/DS_4300/recipes/data/edges.csv')
+    load_neo4j(
+        collection, '/Users/max/Northeastern/spring_2023/DS_4300/recipes/data/edges.csv')
