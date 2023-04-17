@@ -2,23 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/staticFiles/style.css">
     <title>Recipe Recommendation System</title>
 </head>
 <body>
+    <div class="page">
     <div>
-        <h1>home page</h1>
+        <h1>Recipe Recommendation System</h1>
     </div>
-
-    <div>
-        <form action="" method="post">
-            <label for="firstname">First Name:</label>
-            <input type="text" id="firstname" name="fname" placeholder="firstname">
-            <label for "lastname">Last Name:</label>
-            <input type="text" id="lastname" name="lname" placeholder="lastname">
+    <div class="flex-container">
+    <div class = "user_input">
+        <form action="get_text" method="POST">
+            <label for="name">Name of Recipe:</label>
+            <br>
+            <input type="text" id="name" name="recipe_name" placeholder="Recipe Name...">
+            <br><br>
+            
+                <label for="dropdown">Recipe Type:</label>
+                <br>
+                <select name="recipe_types">
+                    {% for type in recipe_types %}
+                      <option value="{{type}}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+                <button type="search_button">Search</button>
+           
+            <br><br>
+                <label for="dropdown">Course:</label>
+                <br>
+                <select name="courses">
+                    {% for course in courses %}
+                      <option value="{{course}}">{{ course }}</option>
+                    {% endfor %}
+                </select>
+            
+            <br><br>
+                <label for="dropdown">Cooking Technique:</label>
+                <br>
+                <select name="techniques">
+                    {% for technique in techniques %}
+                      <option value="{{technique}}">{{ technique }}</option>
+                    {% endfor %}
+                </select>
+            <br><br>
+                <label for="dropdown">Cuisine:</label>
+                <br>
+                <select name="cuisines">
+                    {% for cuisine in cuisines %}
+                      <option value="{{cuisine}}">{{ cuisine }}</option>
+                    {% endfor %}
+                </select>
+            <br><br>
+            <label for="ingredients">Ingredients:</label>
+            <br>
+            <input type="text" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
+            <br>
+            <br><br>
+                <label for="dropdown">Select Friend</label>
+                <br>
+                <select name="users">
+                    {% for user in users %}
+                      <option value="{{user}}">{{ user }}</option>
+                    {% endfor %}
+                </select>
+            <br><br>
+            <form action="print_list" method="POST">
+                <h1>String: {{ string_value }}</h1>
+                <button type="submit">Add</button>
+            </form>
+            
             <button type="submit">Submit</button>
         </form>
+        <form action="clear_results" method="POST"></form>
+        <br><br>
+    </div>
+    
+    <div class="suggestions">
+        Suggestion:
+        <output class="output" type="text" id="output" name="recipe_output" placeholder="Suggestion Here..."></output>
+    </div>
     </div>
     
 </body>

@@ -1,0 +1,36 @@
+h1 {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+.page {
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-right: 100px;
+    margin-left: 100px;
+}
+
+body {
+    background-color: #18baad;
+
+}
+
+.flex-container {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.user_input {
+    flex: 1;
+}
+
+.output {
+    flex: 1;
+}
+
+.suggestion {
+    fill: #ffffff;
+}
