@@ -18,7 +18,7 @@ Ava Duggan, Max Rizzuto, Julian Savini, Anjali Tanna
 
 - MongoDB
   - Storing `recipe_data.json`
-  
- - Neo4j
+
+- Neo4j
   - Creating [:SIMILAR] relationships between recipes
   - Creating recommendations
