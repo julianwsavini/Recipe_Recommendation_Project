@@ -25,7 +25,7 @@
                       <option value="{{type}}">{{ type }}</option>
                     {% endfor %}
                 </select>
-                <button type="search_button">Search</button>
+                <button id="search_button" type="search_button">Search</button>
            
             <br><br>
                 <label for="dropdown">Course:</label>
@@ -53,12 +53,7 @@
                     {% endfor %}
                 </select>
             <br><br>
-            <label for="ingredients">Ingredients:</label>
-            <br>
-            <input type="text" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
-            <br>
-            <br><br>
-                <label for="dropdown">Select Friend</label>
+            <label for="dropdown">Select Friend</label>
                 <br>
                 <select name="users">
                     {% for user in users %}
@@ -66,15 +61,17 @@
                     {% endfor %}
                 </select>
             <br><br>
-            <form action="print_list" method="POST">
-                <h1>String: {{ string_value }}</h1>
-                <button type="submit">Add</button>
-            </form>
-            
-            <button type="submit">Submit</button>
+            <label for="ingredients">Enter an Ingredient:</label>
         </form>
-        <form action="clear_results" method="POST"></form>
-        <br><br>
+        <br>
+        <form action="print_list" method="POST">
+            <input type="text" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
+            <p>Current Ingredients: {{ string_value }}</p>
+            <button type="submit">Add</button>
+        </form>
+        <form action="clear_results" method="POST">
+            <button id="add-button" type="submit">Clear</button>
+        </form>
     </div>
     
     <div class="suggestions">
