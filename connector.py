@@ -196,6 +196,14 @@ def run_query(query_dct, uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5
     return [x.data() for x in result]
 
 
+def get_recipes(uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.PZR'):
+    driver = GraphDatabase.driver(uri, auth=(user, pw))
+    with driver.session() as session:
+        query = 'MATCH (r:recipes) RETURN r.name as recipes'
+        result = session.execute_read(match_recipe, query)
+        return [list(x.data().values())[0] for x in result]
+
+
 if __name__ == '__main__':
     # import data into mongo
     collection = load_mongo('recipes', 'data/recipe_data.json')

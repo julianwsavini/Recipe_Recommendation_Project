@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint, render_template, request
-from connector import run_query
+from connector import run_query, get_recipes
 import pandas as pd
 
 
@@ -52,6 +52,9 @@ def get_text():
            'None Selected' and val != ''}
     rslt = run_query(dct)
     print(rslt)
+
+    recipes = get_recipes()
+    print(recipes)
     # print(name, type, course, technique, cuisine, ingredients, input_user)
     return render_template("index.html", recipe_types=recipe_types,
                            courses=courses, techniques=techniques, users=users, cuisines=cuisines)
