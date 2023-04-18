@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, render_template, request
+from flask import Flask, Blueprint, render_template, request, jsonify
 import pandas as pd
 
 
@@ -29,7 +29,7 @@ def index():
 
 @app.route('/print_list', methods=['POST'])
 def display_string():
-    ingredients_list = "hi"
+    ingredients_list = request.form.get("recipe_ingredients")
     return render_template('index.html', string_value=ingredients_list, recipe_types=recipe_types,
                            courses=courses, techniques=techniques, users=users, cuisines=cuisines)
 
@@ -41,9 +41,10 @@ def get_text():
     course = request.form['courses']
     technique = request.form['techniques']
     cuisine = request.form['cuisines']
-    ingredients = request.form['recipe_ingredients']
     input_user = request.form['users']
-    print(name, type, course, technique, cuisine, ingredients, input_user)
+    ingredients_list = request.form.get("ingredients")
+    print(ingredients_list)
+    #print(name, type, course, technique, cuisine, ingredients, input_user)
     return render_template("index.html", recipe_types=recipe_types,
                            courses=courses, techniques=techniques, users=users, cuisines=cuisines)
 
