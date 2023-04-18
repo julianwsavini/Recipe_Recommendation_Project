@@ -46,12 +46,13 @@ def get_text():
     technique = request.form['techniques']
     cuisine = request.form['cuisines']
     input_user = request.form['users']
+    ingredients = request.form['ingredients']
     dct = {'name': name, 'recipeType': type, 'course': course,
            'technique': technique, 'cuisine': cuisine, 'ingredients': ingredients}
     dct = {key: val for key, val in dct.items() if val !=
            'None Selected' and val != ''}
     rslt = run_query(dct)
-    print(get_ingredients())
+    print(f'*************\nINGREDIENTS:\n{ingredients}\n*************')
 
     # print(name, type, course, technique, cuisine, ingredients, input_user)
 

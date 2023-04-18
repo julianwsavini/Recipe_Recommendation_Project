@@ -13,6 +13,7 @@
     <div class="flex-container">
     <div class = "user_input">
         <form action="get_text" method="POST">
+            <input type="hidden" name="ingredients" value="{{ request.form.recipe_ingredients }}">  
             <label for="name">Name of Recipe:</label>
             <br>
             <input type="text" id="name" name="recipe_name" placeholder="Recipe Name...">
