@@ -193,7 +193,7 @@ def run_query(query_dct, uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5
     with driver.session() as session:
         query = dct_to_query(query_dct)
         result = session.execute_read(match_recipe, query)
-    return [x.data() for x in result]
+    return [x.data() for x in result][0]['recipes']
 
 
 def get_recipes(uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.PZR'):

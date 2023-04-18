@@ -53,8 +53,6 @@ def get_text():
     rslt = run_query(dct)
     print(rslt)
 
-    recipes = get_recipes()
-    print(recipes)
     # print(name, type, course, technique, cuisine, ingredients, input_user)
     return render_template("index.html", recipe_types=recipe_types,
                            courses=courses, techniques=techniques, users=users, cuisines=cuisines)
