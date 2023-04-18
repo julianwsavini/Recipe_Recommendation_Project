@@ -1,7 +1,8 @@
 
 from connector import run_query, get_recipes, get_ingredients
-from flask import Flask, Blueprint, render_template, request, jsonify
+from flask import Flask, Blueprint, render_template, request, jsonify, Response
 import pandas as pd
+import json
 
 
 recipe_types = ['None Selected', 'YummlyOriginal',
@@ -29,18 +30,26 @@ recipes = ['Grilled Swordfish with Chimichurri Sauce', 'Tamales', 'Homemade Humm
 
 app = Flask(__name__, template_folder="templates", static_folder="staticFiles")
 
-
 @app.route("/")
 def index():
-    return render_template("index.html", recipe_types=recipe_types, courses=courses, techniques=techniques, users=users, cuisines=cuisines)
+    return render_template("index.html", recipe_types=recipe_types, courses=courses, techniques=techniques, cuisines=cuisines)
 
 
 @app.route('/print_list', methods=['POST'])
 def display_string():
     ingredients_list = request.form.get("recipe_ingredients")
     return render_template('index.html', string_value=ingredients_list, recipe_types=recipe_types,
-                           courses=courses, techniques=techniques, users=users, cuisines=cuisines)
+                           courses=courses, techniques=techniques, cuisines=cuisines)
 
+@app.route('/autocomplete')
+def autocomplete():
+    search = request.form.get('recipe_ingredients')
+    print(search)
+    if search is not None:
+        filtered_suggestions = [suggestion for suggestion in ingredients if search.lower() in suggestion.lower()]
+        return jsonify(filtered_suggestions)
+    else:
+        return ""
 
 @app.route("/get_text", methods=['POST'])
 def get_text():
@@ -49,18 +58,14 @@ def get_text():
     course = request.form['courses']
     technique = request.form['techniques']
     cuisine = request.form['cuisines']
-    input_user = request.form['users']
     ingredients = request.form['ingredients']
     dct = {'name': name, 'recipeType': type, 'course': course,
            'technique': technique, 'cuisine': cuisine, 'ingredients': ingredients}
     dct = {key: val for key, val in dct.items() if val !=
            'None Selected' and val != ''}
     rslt = run_query(dct)
-
-    # print(name, type, course, technique, cuisine, ingredients, input_user)
-
     return render_template("index.html", recipe_types=recipe_types,
-                           courses=courses, techniques=techniques, users=users, cuisines=cuisines)
+                           courses=courses, techniques=techniques, cuisines=cuisines, recommendations=rslt)
 
 
 @app.route("/clear_results")
@@ -68,14 +73,5 @@ def clear_variables():
 
     return render_template("index.html")
 
-
-def read_csv(filename):
-    df = pd.read_csv(filename)
-    return df
-
-
 if __name__ == '__main__':
-    users_df = read_csv('data/mock_users.csv')
-    users = users_df['user'].unique()
-    users[:0] = ['None Selected']
     app.run(debug=True, port=8000)

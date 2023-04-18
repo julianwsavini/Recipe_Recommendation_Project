@@ -1,18 +1,15 @@
-h1 {
-    font-family: Arial, Helvetica, sans-serif;
-    text-align: center;
-}
-
 .page {
-    margin-top: 100px;
+    margin-top: 5px;
     margin-bottom: 100px;
     margin-right: 100px;
     margin-left: 100px;
+    width: 92%;
 }
 
 body {
-    background-color: #18baad;
-
+    background-color: #d1e9e9;
+    color: #2e6ca2;
+    width: 100%;
 }
 
 .flex-container {
@@ -23,14 +20,61 @@ body {
     flex-direction: row;
 }
 
-.user_input {
-    flex: 1;
+.title {
+    display: flex;
+    justify-content: center;
 }
 
-.output {
+.image_column {
     flex: 1;
+    width: 100%;
+    justify-content: center;
+}
+
+.right_col {
+    flex: 1;
+    width: 100%;
+    justify-content: right;
+}
+
+.user_input {
+    flex: 1;
+    width: 100%;
+    text-align: left;
+}
+
+.suggestions {
+    flex: 1;
+    width: 100%;
+    text-align: center;
 }
 
 .suggestion {
-    fill: #ffffff;
+    fill: #d1e9e9;
+}
+
+.search_button {
+    width: 100px;
+    height: 40px;
+    font-size: 20px;
+    color: #2b9927;
+}
+
+.input_box {
+    width: 60%;
+    border: 2px #2e6ca2;
+    border-radius: 5px;
+}
+
+.dropdown {
+    background-color: #d1e9e9;
+    border: 1px solid #2e6ca2;
+    border-radius: 5%;
+    width: 60%;
+}
+
+.add_button {
+    width: 50px;
+    height: 30px;
+    color: #2e6ca2;
 }

@@ -4,34 +4,49 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/staticFiles/style.css">
     <title>Recipe Recommendation System</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
 <body>
     <div class="page">
-    <div>
-        <h1>Recipe Recommendation System</h1>
+    <div class="title">
+        <img src="../staticFiles/imgs/header.png" width="1200" height="300">
     </div>
     <div class="flex-container">
-    <div class = "user_input">
+        <div class="image_column">
+            <br><br>
+            <img src="../staticFiles/imgs/berries.png" width="100" height="100">
+            <br>
+            <img src="../staticFiles/imgs/utensils.png" width="100" height="100">
+            <br>
+            <img src="../staticFiles/imgs/lemon wedge.png" width="100" height="100">
+            <br>
+            <img src="../staticFiles/imgs/lime.png" width="100" height="100">
+            <br>
+            <img src="../staticFiles/imgs/pans.png" width="100" height="100">
+        </div>
+        <div class="user_input">
         <form action="get_text" method="POST">
-            <input type="hidden" name="ingredients" value="{{ request.form.recipe_ingredients }}">  
+            <input type="hidden" class="input_box" name="ingredients" value="{{ request.form.recipe_ingredients }}">  
+            <button id="search_button" class = "search_button" type="search_button">Search</button>
+            <br><br><br>
             <label for="name">Name of Recipe:</label>
             <br>
-            <input type="text" id="name" name="recipe_name" placeholder="Recipe Name...">
+            <input type="text" class="input_box" id="name" name="recipe_name" placeholder="Recipe Name...">
             <br><br>
-            
                 <label for="dropdown">Recipe Type:</label>
                 <br>
-                <select name="recipe_types">
+                <select class="dropdown" name="recipe_types">
                     {% for type in recipe_types %}
                       <option value="{{type}}">{{ type }}</option>
                     {% endfor %}
                 </select>
-                <button id="search_button" type="search_button">Search</button>
-           
+                
             <br><br>
                 <label for="dropdown">Course:</label>
                 <br>
-                <select name="courses">
+                <select class="dropdown" name="courses">
                     {% for course in courses %}
                       <option value="{{course}}">{{ course }}</option>
                     {% endfor %}
@@ -40,7 +55,7 @@
             <br><br>
                 <label for="dropdown">Cooking Technique:</label>
                 <br>
-                <select name="techniques">
+                <select class="dropdown" name="techniques">
                     {% for technique in techniques %}
                       <option value="{{technique}}">{{ technique }}</option>
                     {% endfor %}
@@ -48,17 +63,9 @@
             <br><br>
                 <label for="dropdown">Cuisine:</label>
                 <br>
-                <select name="cuisines">
+                <select class="dropdown" name="cuisines">
                     {% for cuisine in cuisines %}
                       <option value="{{cuisine}}">{{ cuisine }}</option>
-                    {% endfor %}
-                </select>
-            <br><br>
-            <label for="dropdown">Select Friend</label>
-                <br>
-                <select name="users">
-                    {% for user in users %}
-                      <option value="{{user}}">{{ user }}</option>
                     {% endfor %}
                 </select>
             <br><br>
@@ -66,19 +73,41 @@
         </form>
         <br>
         <form action="print_list" method="POST">
-            <input type="text" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
+            <input type="text" class="input_box" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
             <p>Current Ingredients: {{ string_value }}</p>
-            <button type="submit">Add</button>
+            <button class="add_button" type="submit">Add</button>
+            <script>
+                $(function() {
+                    $('#ingredients').autocomplete({
+                        source: '/autocomplete',
+                        minLength: 2
+                    });
+                });
+            </script>
         </form>
-        <form action="clear_results" method="POST">
-            <button id="add-button" type="submit">Clear</button>
-        </form>
-    </div>
+        </div>
     
-    <div class="suggestions">
+        <div class="suggestions">
         Suggestion:
         <output class="output" type="text" id="output" name="recipe_output" placeholder="Suggestion Here..."></output>
-    </div>
+        <textarea rows="10" cols="50">
+            {% for suggestion in recommendations %}
+              {{ suggestion }}{% if not loop.last %}\n{% endif %}
+            {% endfor %}
+          </textarea>
+        </div>
+        <div class="right_col">
+        <br><br>
+        <img src="../staticFiles/imgs/bowls.png" width="100" height="100">
+        <br>
+        <img src="../staticFiles/imgs/leaves.png" width="100" height="100">
+        <br>
+        <img src="../staticFiles/imgs/lemon.png" width="100" height="100">
+        <br>
+        <img src="../staticFiles/imgs/mushrooms.png" width="100" height="100">
+        <br>
+        <img src="../staticFiles/imgs/plates.png" width="100" height="100">
+        </div>
     </div>
     
 </body>
