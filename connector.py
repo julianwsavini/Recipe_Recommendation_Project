@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 from neo4j import GraphDatabase
 from prince import FAMD
+import itertools
 import warnings
-
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
@@ -202,6 +202,16 @@ def get_recipes(uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.P
         query = 'MATCH (r:recipes) RETURN r.name as recipes'
         result = session.execute_read(match_recipe, query)
         return [list(x.data().values())[0] for x in result]
+
+
+def get_ingredients(uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.PZR'):
+    driver = GraphDatabase.driver(uri, auth=(user, pw))
+    with driver.session() as session:
+        query = 'MATCH (r:recipes) RETURN r.ingredients as ingredients'
+        result = session.execute_read(match_recipe, query)
+        nested_lst = [x.data()['ingredients']
+                      for x in result for x.data()['ingredients'] in x]
+        return list(set([x for y in nested_lst for x in y]))
 
 
 if __name__ == '__main__':
