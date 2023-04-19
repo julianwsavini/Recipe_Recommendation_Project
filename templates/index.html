@@ -39,7 +39,7 @@
         </div>
         <div class="user_input">
         <form action="print_list" method="POST">
-            <label for="ingredients">Enter an Ingredient:</label>
+            <label for="ingredients"><b>Enter an Ingredient:</b></label>
             <br>
             <input type="text" class="input_box" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
             <p>Current Ingredients: {{ string_value }}</p>
@@ -49,11 +49,11 @@
             <input type="hidden" class="input_box" name="ingredients" value="{{ request.form.recipe_ingredients }}">
             
             <br><br>
-            <label for="name">Name of Recipe: </label>
+            <label for="name"><b>Search for a Specific Recipe:</b></label>
             <br>
             <input type="text" class="input_box" id="name" name="recipe_name" placeholder="Recipe Name...">
             <br><br>
-                <label for="dropdown">Recipe Type:</label>
+                <label for="dropdown"><b>Recipe Type:</b></label>
                 <br>
                 <select class="dropdown" name="recipe_types" id="type_id">
                     {% for type in recipe_types %}
@@ -62,7 +62,7 @@
                 </select>
 
             <br><br>
-                <label for="dropdown">Course:</label>
+                <label for="dropdown"><b>Course:</b></label>
                 <br>
                 <select class="dropdown" name="courses" id="course_id">
                     {% for course in courses %}
@@ -71,7 +71,7 @@
                 </select>
 
             <br><br>
-                <label for="dropdown">Cooking Technique:</label>
+                <label for="dropdown"><b>Cooking Technique:</b></label>
                 <br>
                 <select class="dropdown" name="techniques" id="technique_id">
                     {% for technique in techniques %}
@@ -80,7 +80,7 @@
                 </select>
 
             <br><br>
-                <label for="dropdown">Cuisine:</label>
+                <label for="dropdown"><b>Cuisine:</b></label>
                 <br>
                 <select class="dropdown" name="cuisines" id="cuisine_id">
                     {% for cuisine in cuisines %}
@@ -96,7 +96,8 @@
 
         <div class="suggestions">
             <form action="name_suggestion" method="POST">
-                <label for="name">Enter a Recipe:</label>
+                <label for="name"><b>Insert a Recipe for Similar Recommendations</b></label>
+                <p>(including other filters!)</p>
                 <br>
                 <input type="hidden" class="input_box" name="ingredients" id="hidden_ingredients">
                 <input type="hidden" class="input_box" name="recipe_types" id="hidden_type">
