@@ -3,7 +3,7 @@
     margin-bottom: 100px;
     margin-right: 100px;
     margin-left: 100px;
-    width: 92%;
+    width: 100%;
 }
 
 body {
@@ -21,20 +21,36 @@ body {
 }
 
 .title {
+    align-items: center;
     display: flex;
     justify-content: center;
+    position: relative;
 }
 
 .image_column {
     flex: 1;
     width: 100%;
-    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .right_col {
     flex: 1;
     width: 100%;
-    justify-content: right;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.image_column img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.right_col img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .user_input {
@@ -77,4 +93,10 @@ body {
     width: 50px;
     height: 30px;
     color: #2e6ca2;
+}
+
+textarea {
+    background: #d1e9e9;
+    border: 2px solid #2e6ca2; 
+    border-radius: 5%;
 }

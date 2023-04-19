@@ -11,7 +11,17 @@
 <body>
     <div class="page">
     <div class="title">
+        <div>
         <img src="../staticFiles/imgs/header.png" width="1200" height="300">
+        </div>
+        <div>
+            <p class="intro">Looking for a recipe recommendation based on type,
+            cuisine, cooking technique, or ingredients? Or are you someone
+            with limited recipe knowledge who wants to try something new?
+            Input your preferences below and just like magic- you'll have
+            a new recipe to recreate!
+        </p>
+        </div>
     </div>
     <div class="flex-container">
         <div class="image_column">
@@ -76,19 +86,11 @@
             <input type="text" class="input_box" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
             <p>Current Ingredients: {{ string_value }}</p>
             <button class="add_button" type="submit">Add</button>
-            <script>
-                $(function() {
-                    $('#ingredients').autocomplete({
-                        source: '/autocomplete',
-                        minLength: 2
-                    });
-                });
-            </script>
         </form>
         </div>
     
         <div class="suggestions">
-        Suggestion:
+        Suggestions:
         <output class="output" type="text" id="output" name="recipe_output" placeholder="Suggestion Here..."></output>
         <textarea rows="10" cols="50">
             {% for suggestion in recommendations %}
@@ -110,5 +112,21 @@
         </div>
     </div>
     
+    <script>
+        $(function() {
+            $('#ingredients').autocomplete({
+                source: '/autocomplete',
+                minLength: 2
+            });
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#name').autocomplete({
+                source: '/autocomplete',
+                minLength: 2
+            });
+        });
+    </script>
 </body>
 </html>

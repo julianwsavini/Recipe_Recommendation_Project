@@ -41,9 +41,9 @@ def display_string():
     return render_template('index.html', string_value=ingredients_list, recipe_types=recipe_types,
                            courses=courses, techniques=techniques, cuisines=cuisines)
 
-@app.route('/autocomplete')
+@app.route('/autocomplete', methods=['POST'])
 def autocomplete():
-    search = request.form.get('recipe_ingredients')
+    search = request.args.get('recipe_name')
     print(search)
     if search is not None:
         filtered_suggestions = [suggestion for suggestion in ingredients if search.lower() in suggestion.lower()]
