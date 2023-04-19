@@ -1,5 +1,5 @@
 
-from connector import run_query, get_recipes, get_ingredients, get_similar_recipes
+from connector import run_query, get_recipes, get_ingredients, get_similar_recipes, stack_output
 from flask import Flask, Blueprint, render_template, request, jsonify, Response
 import pandas as pd
 import json
@@ -70,8 +70,15 @@ def get_text():
     dct = {key: val for key, val in dct.items() if val !=
            'None Selected' and val != ''}
     rslt = run_query(dct)
+
+    new_list = [{'Name': d['name'],
+                 'Cuisine': d['cuisine'],
+                 'Ingredients': d['ingredients'],
+                 'URL': d['url']} for d in rslt]
+
+    stacked = stack_output(new_list)
     return render_template("index.html", recipe_types=recipe_types,
-                           courses=courses, techniques=techniques, cuisines=cuisines, recommendations=rslt)
+                           courses=courses, techniques=techniques, cuisines=cuisines, recommendations=stacked)
 
 
 @app.route("/clear_results")
@@ -89,9 +96,17 @@ def suggestions():
     cuisine = request.form['cuisines']
     dct = {'recipeType': recipe_type, 'course': course,
            'technique': technique, 'cuisine': cuisine, 'ingredients': ingredients}
-    results = get_similar_recipes(recipe, dct)
+    rslt = get_similar_recipes(recipe, dct)
+
+    new_list = [{'Name': [d['name'], d['url']],
+                 'Cuisine': ', '.join(d['cuisine']),
+                 'Techniques': ', '.join(d['technique']),
+                 'Ingredients': ', '.join(d['ingredients']),
+                 } for d in rslt]
+
+    stacked = stack_output(new_list)
     return render_template("index.html", recipe_types=recipe_types,
-                           courses=courses, techniques=techniques, cuisines=cuisines, recommendations=results)
+                           courses=courses, techniques=techniques, cuisines=cuisines, recommendations=stacked)
 
 
 if __name__ == '__main__':

@@ -155,15 +155,15 @@ def dct_to_query(dct, merge=False):
 
     if not dct:
         if merge:
-            return 'MATCH (r) RETURN r as recipes '
-        return 'MATCH (r) RETURN r as recipes LIMIT 5'
+            return 'MATCH (r) as matches '
+        return 'MATCH (r) RETURN r as recipes LIMIT 3'
 
     if len(dct) == 1:
         key = list(dct.keys())[0]
         val = list(dct.values())[0]
         if merge:
-            return f'MATCH (r) WHERE ANY ({key} IN r.{key} WHERE {key} CONTAINS "{val}") WITH collect(r) as r RETURN r as recipes '
-        return f'MATCH (r) WHERE ANY ({key} IN r.{key} WHERE {key} CONTAINS "{val}") WITH collect(r) as r RETURN r as recipes LIMIT 5'
+            return f'MATCH (r) WHERE ANY ({key} IN r.{key} WHERE {key} CONTAINS "{val}") WITH collect(r) as matches '
+        return f'MATCH (r) WHERE ANY ({key} IN r.{key} WHERE {key} CONTAINS "{val}") WITH collect(r) as r RETURN r as recipes LIMIT 3'
 
     # generate aliases for each separate match
     aliases = [f'r{x}' for x in range(len(dct))]
@@ -189,8 +189,7 @@ def dct_to_query(dct, merge=False):
     if merge:
         query += f'WITH {inter} as matches '
         return query
-    query += f'RETURN {inter} as recipes LIMIT 5'
-    print(query)
+    query += f'RETURN {inter} as recipes LIMIT 3'
     return query
 
 
@@ -236,12 +235,24 @@ def get_similar_recipes(name, dct, uri='bolt://localhost:7687', user='neo4j', pw
     with driver.session() as session:
         query = dct_to_query(dct, merge=True)
         query += 'MATCH (n:recipes {name: "' + name + \
-            '"})-[s:SIMILAR]-(m) WHERE m IN matches WITH m, s.similarity AS score ORDER BY score ASC RETURN DISTINCT m LIMIT 5'
+            '"})-[s:SIMILAR]-(m) WHERE m IN matches WITH m, s.similarity AS score ORDER BY score ASC RETURN DISTINCT m LIMIT 3'
         # query += 'RETURN matches'
         result = session.execute_read(match_recipe, query)
-        print(query)
-        print(result)
         return [list(x.data().values())[0] for x in result]
+
+
+def stack_output(lst):
+    stacked = '<br><br>'
+    for d in lst:
+        for k, v in d.items():
+            if k == 'Name':
+                stacked += f'<a href="{v[1]}"><b>{v[0]}</b></a>'
+            else:
+                stacked += f"<p><b>{k}</b>: {v}</p>"
+        stacked += '_' * 47
+        stacked += '<br><br>'
+    stacked = stacked[:-55]
+    return stacked
 
 
 if __name__ == '__main__':

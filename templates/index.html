@@ -124,13 +124,12 @@
                     document.getElementById('hidden_cuisine').value = cuisine;
                 }
             </script>
-        Suggestions:
+        <br>
+        Suggestions
         <output class="output" type="text" id="output" name="recipe_output" placeholder="Suggestion Here..."></output>
-        <textarea rows="30" cols="50">
-            {% for suggestion in recommendations %}
-              {{ suggestion }}{% if not loop.last %}\n{% endif %}
-            {% endfor %}
-          </textarea>
+        <!-- <textarea rows="30" cols="50"> -->
+            <code>{{ recommendations | safe }}</code>
+        <!-- </textarea> -->
         </div>
         <div class="right_col">
         <br><br>
