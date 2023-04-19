@@ -38,9 +38,15 @@
             <img src="../staticFiles/imgs/pans.png" width="100" height="100">
         </div>
         <div class="user_input">
+        <form action="print_list" method="POST">
+            <label for="ingredients">Enter an Ingredient:</label>
+            <br>
+            <input type="text" class="input_box" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
+            <p>Current Ingredients: {{ string_value }}</p>
+            <button class="add_button" type="submit">Add</button>
+        </form>
         <form action="get_text" method="POST">
             <input type="hidden" class="input_box" name="ingredients" value="{{ request.form.recipe_ingredients }}">
-            <button id="search_button" class = "search_button" type="submit">Search</button>
             <br><br><br>
             <label for="name">Name of Recipe: </label>
             <br>
@@ -81,13 +87,9 @@
                     {% endfor %}
                 </select>
             <br><br>
-
-            <label for="ingredients">Enter an Ingredient:</label>
-        </form>
-        <form action="print_list" method="POST">
-            <input type="text" class="input_box" id="ingredients" name="recipe_ingredients" placeholder="List of Ingredients">
-            <p>Current Ingredients: {{ string_value }}</p>
-            <button class="add_button" type="submit">Add</button>
+            <button id="search_button" class = "search_button" type="submit">Search</button>
+            <br><br>
+            
         </form>
         </div>
 
