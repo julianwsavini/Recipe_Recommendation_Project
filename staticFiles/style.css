@@ -103,8 +103,10 @@ textarea {
 
 
 /* Style the dropdown list */
-.autocomplete_suggestion {
+.autocomplete-suggestions {
     position: absolute;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
     top: 100%;
     left: 0;
     z-index: 1000;
@@ -124,7 +126,9 @@ textarea {
 }
 
 /* Style the selected item */
-.ui-menu-item-wrapper {
+.autocomplete-suggestion {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
     padding: 3px 20px;
     clear: both;
     font-weight: normal;
@@ -138,8 +142,8 @@ textarea {
 }
 
 /* Style the selected item when it's hovered over */
-.ui-menu-item-wrapper:hover,
-.ui-menu-item-wrapper:focus {
+.autocomplete-suggestion:hover,
+.autocomplete-suggestion:focus {
     color: #ffffff;
     text-decoration: none;
     background-color: #337ab7;

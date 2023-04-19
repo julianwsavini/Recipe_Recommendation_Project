@@ -81,7 +81,6 @@ def get_text():
 
 @app.route("/clear_results")
 def clear_variables():
-
     return render_template("index.html")
 
 
