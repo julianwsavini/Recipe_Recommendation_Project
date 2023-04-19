@@ -30,6 +30,7 @@ recipes = ['Grilled Swordfish with Chimichurri Sauce', 'Tamales', 'Homemade Humm
 
 app = Flask(__name__, template_folder="templates", static_folder="staticFiles")
 
+
 @app.route("/")
 def index():
     return render_template("index.html", recipe_types=recipe_types, courses=courses, techniques=techniques, cuisines=cuisines)
@@ -41,15 +42,25 @@ def display_string():
     return render_template('index.html', string_value=ingredients_list, recipe_types=recipe_types,
                            courses=courses, techniques=techniques, cuisines=cuisines)
 
-@app.route('/autocomplete', methods=['POST'])
-def autocomplete():
-    search = request.args.get('recipe_name')
-    print(search)
-    if search is not None:
-        filtered_suggestions = [suggestion for suggestion in ingredients if search.lower() in suggestion.lower()]
-        return jsonify(filtered_suggestions)
-    else:
-        return ""
+
+@app.route("/search/<string:box>")
+def process(box):
+    query = request.args.get('query')
+    if box == 'recipe_ingredients':
+        # do some stuff to open your names text file
+        # do some other stuff to filter
+        # put suggestions in this format...
+        suggestions = [{'value': x, 'data': x}
+                       for x in get_ingredients() if query.lower() in x.lower()]
+    if box == 'recipe_name':
+        # do some stuff to open your songs text file
+        # do some other stuff to filter
+        # put suggestions in this format...
+        suggestions = [{'value': x, 'data': x}
+                       for x in get_recipes() if query.lower() in x.lower()]
+
+    return jsonify({"suggestions": suggestions})
+
 
 @app.route("/get_text", methods=['POST'])
 def get_text():
@@ -72,6 +83,7 @@ def get_text():
 def clear_variables():
 
     return render_template("index.html")
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

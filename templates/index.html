@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/staticFiles/style.css">
     <title>Recipe Recommendation System</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-
+    
+	<!--<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.2.26/jquery.autocomplete.min.js"></script>
 </head>
 <body>
     <div class="page">
@@ -113,22 +113,22 @@
         <img src="../staticFiles/imgs/plates.png" width="100" height="100">
         </div>
     </div>
-
     <script>
-        $(function() {
-            $('#ingredients').autocomplete({
-                source: '/autocomplete',
-                minLength: 2
-            });
+        $('#name').autocomplete({
+            serviceUrl: '/search/recipe_name',
+            dataType: 'json',
+            onSearchComplete: function (query, suggestions) {
+              console.log(query);
+            }
         });
-    </script>
-    <script>
-        $(function() {
-            $('#name').autocomplete({
-                source: '/autocomplete',
-                minLength: 2
-            });
+      
+        $('#ingredients').autocomplete({
+            serviceUrl: '/search/recipe_ingredients',
+            dataType: 'json',
+            onSearchComplete: function (query, suggestions) {
+              console.log(query);
+            }
         });
-    </script>
+        </script>
 </body>
 </html>
