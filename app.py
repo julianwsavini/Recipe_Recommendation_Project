@@ -1,5 +1,5 @@
 
-from connector import run_query, get_recipes, get_ingredients
+from connector import run_query, get_recipes, get_ingredients, get_similar_recipes
 from flask import Flask, Blueprint, render_template, request, jsonify, Response
 import pandas as pd
 import json
@@ -77,6 +77,13 @@ def get_text():
 @app.route("/clear_results")
 def clear_variables():
     return render_template("index.html")
+
+
+@app.route('/name_suggestion', methods=['POST'])
+def suggestions():
+    recipe = request.form['recipe_name_suggestion']
+    results = get_similar_recipes(recipe)
+    return render_template("index.html", recommendations=results)
 
 
 if __name__ == '__main__':

@@ -218,6 +218,15 @@ def get_ingredients(uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_h
         return list(set([x for y in nested_lst for x in y]))
 
 
+def get_similar_recipes(name, uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.PZR'):
+    driver = GraphDatabase.driver(uri, auth=(user, pw))
+    with driver.session() as session:
+        query = "MATCH (n:recipes {name: '" + name + \
+            "'})-[r:SIMILAR]-(m:recipes) WITH m, r.similarity as similarity ORDER BY similarity ASC RETURN DISTINCT m LIMIT 5"
+        result = session.execute_read(match_recipe, query)
+        return [list(x.data().values())[0] for x in result]
+
+
 if __name__ == '__main__':
     # import data into mongo
     collection = load_mongo('recipes', 'data/recipe_data.json')
