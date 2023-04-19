@@ -106,6 +106,7 @@ textarea {
 .autocomplete-suggestions {
     position: absolute;
     overflow-wrap: break-word;
+    overflow: scroll;
     word-wrap: break-word;
     top: 100%;
     left: 0;

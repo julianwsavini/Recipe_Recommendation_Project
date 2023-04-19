@@ -98,7 +98,7 @@
             <form action="name_suggestion" method="POST">
                 <label for="name">Enter a Recipe:</label>
                 <br>
-                <input type="text" class="input_box" id="name" name="recipe_name" placeholder="Recipe Name...">
+                <input type="text" class="input_box" id="name_suggestion" name="recipe_name_suggestion" placeholder="Recipe Name...">
                 <br><br>
                 <button class="search_button">Search</button>
             </form>
@@ -132,6 +132,14 @@
             }
         });
       
+        $('#name_suggestion').autocomplete({
+            serviceUrl: '/search/recipe_name',
+            dataType: 'json',
+            onSearchComplete: function (query, suggestions) {
+              console.log(query);
+            }
+        });
+
         $('#ingredients').autocomplete({
             serviceUrl: '/search/recipe_ingredients',
             dataType: 'json',
