@@ -47,7 +47,8 @@
         </form>
         <form action="get_text" method="POST">
             <input type="hidden" class="input_box" name="ingredients" value="{{ request.form.recipe_ingredients }}">
-            <br><br><br>
+            
+            <br><br>
             <label for="name">Name of Recipe: </label>
             <br>
             <input type="text" class="input_box" id="name" name="recipe_name" placeholder="Recipe Name...">
@@ -94,6 +95,13 @@
         </div>
 
         <div class="suggestions">
+            <form action="name_suggestion" method="POST">
+                <label for="name">Enter a Recipe:</label>
+                <br>
+                <input type="text" class="input_box" id="name" name="recipe_name" placeholder="Recipe Name...">
+                <br><br>
+                <button class="search_button">Search</button>
+            </form>
         Suggestions:
         <output class="output" type="text" id="output" name="recipe_output" placeholder="Suggestion Here..."></output>
         <textarea rows="30" cols="50">
