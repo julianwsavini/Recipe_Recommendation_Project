@@ -147,13 +147,22 @@ def load_neo4j(collection, edge_url, uri='bolt://localhost:7687', user='neo4j', 
         tx.commit()
 
 
-def dct_to_query(dct):
+def dct_to_query(dct, merge=False):
     """Convert dictionary of query attributes into query"""
 
     # if there's only one attribute, return a simple query
+    dct = {k: v for k, v in dct.items() if v != 'None Selected'}
+
+    if not dct:
+        if merge:
+            return 'MATCH (r) RETURN r as recipes '
+        return 'MATCH (r) RETURN r as recipes LIMIT 5'
+
     if len(dct) == 1:
         key = list(dct.keys())[0]
         val = list(dct.values())[0]
+        if merge:
+            return f'MATCH (r) WHERE ANY ({key} IN r.{key} WHERE {key} CONTAINS "{val}") WITH collect(r) as r RETURN r as recipes '
         return f'MATCH (r) WHERE ANY ({key} IN r.{key} WHERE {key} CONTAINS "{val}") WITH collect(r) as r RETURN r as recipes LIMIT 5'
 
     # generate aliases for each separate match
@@ -177,7 +186,11 @@ def dct_to_query(dct):
         if not inter:
             inter = alias
         inter = f'apoc.coll.intersection({alias}, {inter})'
+    if merge:
+        query += f'WITH {inter} as matches '
+        return query
     query += f'RETURN {inter} as recipes LIMIT 5'
+    print(query)
     return query
 
 
@@ -218,12 +231,16 @@ def get_ingredients(uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_h
         return list(set([x for y in nested_lst for x in y]))
 
 
-def get_similar_recipes(name, uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.PZR'):
+def get_similar_recipes(name, dct, uri='bolt://localhost:7687', user='neo4j', pw='epd9htf5kvd_hwt.PZR'):
     driver = GraphDatabase.driver(uri, auth=(user, pw))
     with driver.session() as session:
-        query = "MATCH (n:recipes {name: '" + name + \
-            "'})-[r:SIMILAR]-(m:recipes) WITH m, r.similarity as similarity ORDER BY similarity ASC RETURN DISTINCT m LIMIT 5"
+        query = dct_to_query(dct, merge=True)
+        query += 'MATCH (n:recipes {name: "' + name + \
+            '"})-[s:SIMILAR]-(m) WHERE m IN matches WITH m, s.similarity AS score ORDER BY score ASC RETURN DISTINCT m LIMIT 5'
+        # query += 'RETURN matches'
         result = session.execute_read(match_recipe, query)
+        print(query)
+        print(result)
         return [list(x.data().values())[0] for x in result]
 
 

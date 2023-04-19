@@ -55,7 +55,7 @@
             <br><br>
                 <label for="dropdown">Recipe Type:</label>
                 <br>
-                <select class="dropdown" name="recipe_types">
+                <select class="dropdown" name="recipe_types" id="type_id">
                     {% for type in recipe_types %}
                       <option value="{{type}}">{{ type }}</option>
                     {% endfor %}
@@ -64,7 +64,7 @@
             <br><br>
                 <label for="dropdown">Course:</label>
                 <br>
-                <select class="dropdown" name="courses">
+                <select class="dropdown" name="courses" id="course_id">
                     {% for course in courses %}
                       <option value="{{course}}">{{ course }}</option>
                     {% endfor %}
@@ -73,7 +73,7 @@
             <br><br>
                 <label for="dropdown">Cooking Technique:</label>
                 <br>
-                <select class="dropdown" name="techniques">
+                <select class="dropdown" name="techniques" id="technique_id">
                     {% for technique in techniques %}
                       <option value="{{technique}}">{{ technique }}</option>
                     {% endfor %}
@@ -82,7 +82,7 @@
             <br><br>
                 <label for="dropdown">Cuisine:</label>
                 <br>
-                <select class="dropdown" name="cuisines">
+                <select class="dropdown" name="cuisines" id="cuisine_id">
                     {% for cuisine in cuisines %}
                       <option value="{{cuisine}}">{{ cuisine }}</option>
                     {% endfor %}
@@ -98,10 +98,32 @@
             <form action="name_suggestion" method="POST">
                 <label for="name">Enter a Recipe:</label>
                 <br>
+                <input type="hidden" class="input_box" name="ingredients" id="hidden_ingredients">
+                <input type="hidden" class="input_box" name="recipe_types" id="hidden_type">
+                <input type="hidden" class="input_box" name="courses" id="hidden_course">
+                <input type="hidden" class="input_box" name="techniques" id="hidden_technique">
+                <input type="hidden" class="input_box" name="cuisines" id="hidden_cuisine">
                 <input type="text" class="input_box" id="name_suggestion" name="recipe_name_suggestion" placeholder="Recipe Name...">
                 <br><br>
-                <button class="search_button">Search</button>
+                <button class="search_button" onclick="submitForm()">Search</button>
             </form>
+            <script>
+                function submitForm() {
+                    // Get the values of input1 and input2 from form1
+                    var ingredients = document.getElementById('ingredients').value;
+                    var type = document.getElementById('type_id').value;
+                    var course = document.getElementById('course_id').value;
+                    var technique = document.getElementById('technique_id').value;
+                    var cuisine = document.getElementById('cuisine_id').value;
+
+                    // Set the values of input3 and input4 in form2 to the values of input1 and input2 from form1
+                    document.getElementById('hidden_ingredients').value = ingredients;
+                    document.getElementById('hidden_type').value = type;
+                    document.getElementById('hidden_course').value = course;
+                    document.getElementById('hidden_technique').value = technique;
+                    document.getElementById('hidden_cuisine').value = cuisine;
+                }
+            </script>
         Suggestions:
         <output class="output" type="text" id="output" name="recipe_output" placeholder="Suggestion Here..."></output>
         <textarea rows="30" cols="50">

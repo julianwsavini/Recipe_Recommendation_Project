@@ -82,8 +82,16 @@ def clear_variables():
 @app.route('/name_suggestion', methods=['POST'])
 def suggestions():
     recipe = request.form['recipe_name_suggestion']
-    results = get_similar_recipes(recipe)
-    return render_template("index.html", recommendations=results)
+    ingredients = request.form['ingredients']
+    recipe_type = request.form['recipe_types']
+    course = request.form['courses']
+    technique = request.form['techniques']
+    cuisine = request.form['cuisines']
+    dct = {'recipeType': recipe_type, 'course': course,
+           'technique': technique, 'cuisine': cuisine, 'ingredients': ingredients}
+    results = get_similar_recipes(recipe, dct)
+    return render_template("index.html", recipe_types=recipe_types,
+                           courses=courses, techniques=techniques, cuisines=cuisines, recommendations=results)
 
 
 if __name__ == '__main__':
