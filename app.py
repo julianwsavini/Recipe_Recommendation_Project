@@ -71,10 +71,11 @@ def get_text():
            'None Selected' and val != ''}
     rslt = run_query(dct)
 
-    new_list = [{'Name': d['name'],
-                 'Cuisine': d['cuisine'],
-                 'Ingredients': d['ingredients'],
-                 'URL': d['url']} for d in rslt]
+    new_list = [{'Name': [d['name'], d['url']],
+                 'Cuisine': ', '.join(d['cuisine']),
+                 'Techniques': ', '.join(d['technique']),
+                 'Ingredients': ', '.join(d['ingredients']),
+                 } for d in rslt]
 
     stacked = stack_output(new_list)
     return render_template("index.html", recipe_types=recipe_types,
