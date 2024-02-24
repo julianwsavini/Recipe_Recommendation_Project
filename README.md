@@ -1,6 +1,6 @@
 # Recipe Recommendation System
 
-### DS4300 Final Project Spring 2023
+### DS4300 (Large Scale Information and Retrieval) Final Project Spring 2023
 Ava Duggan, Max Rizzuto, Julian Savini, Anjali Tanna
 
 Click below to watch us use the engine!
